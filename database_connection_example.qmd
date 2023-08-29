@@ -17,7 +17,7 @@ library(RPostgres)     # loads the database driver for PostgreSQL
 library(connections)   # helps RPostgres work with RStudio
 library(keyring)       # access to a local encrypted keychain for passwords
 
-# You will need to set your password once here:
+# You will need to set your password once (enter the command below in the console):
 # key_set(service = "syntheticmguh", username = "hids502_student", prompt = "Password: ")
 
 # Note we use "connection_open" rather than "dbConnect", this is to ensure full integration
