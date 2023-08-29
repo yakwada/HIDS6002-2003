@@ -27,12 +27,8 @@ con <- connection_open(RPostgres::Postgres(),
           host = "34.85.177.140",
           user = "hids502_student",
           password = key_get(service = "syntheticmguh", 
-                             username = "hids502_student"),
-          bigint = "numeric")
-
-# Use this to set a default connection for every SQL chunk
-# There seems to be some sort of bug in Quarto that requires this
-knitr::opts_chunk$set(connection = "con")
+                             username = "hids502_student")
+          )
 ```
 
 # Querying via SQL
@@ -47,7 +43,7 @@ GROUP BY gender
 
 # Querying and saving 
 
-Sometimes you may want to take the results from your query and then pass them to plotting or other manipulations. You can do this with the `output.var` parameter. (Note that the date manipulations below are PostgreSQL specific - we will review this in more detail in the course.)
+Sometimes you may want to take the results from your query and then pass them to plotting or other manipulations. You can do this with the `output.var` parameter. (Note that the date manipulations in the SQL below are PostgreSQL specific - we will review this in more detail in the course.)
 
 ```{sql connection=con, output.var="patients_df"}
 -- Here we use `output.var` to assign the results of the query to a variable
