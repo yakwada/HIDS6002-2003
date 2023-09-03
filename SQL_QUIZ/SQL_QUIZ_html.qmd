@@ -1,0 +1,142 @@
+---
+title: "SQL QUIZ Results"
+format: html
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r}
+#read in data and clean it
+survey_df <- read.csv('Data/student_report.csv')
+#remove personal columns
+colnames(survey_df)
+survey_df <- survey_df[-c(1:7)]
+
+
+```
+
+# Clean Dataset
+
+```{r }
+library(dplyr)
+rep_let = rep(c("ANSWER_" , "POINTS_") , times=6)
+rep_num = as.character(rep(c(1:6) , each=2))
+col_names = paste0(rep_let, rep_num)
+
+names(survey_df)[1:12] <- c(col_names)
+invisible(survey_df %>%
+  mutate_all(as.character)
+)
+
+colnames(survey_df)
+```
+# Question 1 
+## Which command in SQL allows you to choose which columns will be returned in the result set?
+
+* GROUP BY
+* WHERE
+* SELECT
+* HAVING
+```{r}
+library(ggplot2)
+library(gghighlight)
+
+ggplot(survey_df , aes(x=ANSWER_1 , fill=ANSWER_1)) + 
+  geom_bar(width=0.2 ) +
+  scale_x_discrete(limits=c( "GROUP BY" ,"SELECT" ,  "HAVING" , "WHERE")) +
+  scale_fill_manual(values = c("SELECT"= "green" ) ,guide="none")
+  
+
+
+```
+
+# Question 2
+## Where is the error in this SQL statement?
+
+_SELECT record_company, band, album, COUNT(*)
+FROM albums
+GROUP BY record_company, band
+HAVING COUNT(*) > 1_
+
+* In the GROUP BY clause
+* In the FROM clause
+* in the HAVING clause
+
+
+```{r}
+
+ggplot(survey_df , aes(x=ANSWER_2 , fill=ANSWER_2)) + 
+  geom_bar(width=0.2) + 
+  scale_x_discrete(labels= c("In the GROUP BY clause" = "GROUP BY" , "In the HAVING clause" = "HAVING" , "In the FROM clause" = "FROM" ) , limits = c("In the GROUP BY clause" , "In the HAVING clause" ,"In the FROM clause")) +
+  scale_fill_manual(values = c("In the GROUP BY clause"= "green" ) ,guide="none")
+
+
+
+```
+
+
+# Question 3 
+## A common table expression:
+
+* embeds a formula in a column
+* is an inline view
+* is an alias for a table name
+* No answer text provided.
+
+```{r}
+
+ ggplot(survey_df , aes(x=ANSWER_3 , fill = ANSWER_3)) + 
+  geom_bar(width=0.2) + 
+   scale_x_discrete(labels= c("is an alias for a table name" = "ALIAS" ,"No answer text provided." = "NO ANSWER"  , "is an inline view" = "INLINE VIEW" , "embeds a formula in a column" = "EMBEDS FORMLA" ) , limits = c("is an alias for a table name" ,  "is an inline view" ,"embeds a formula in a column" , "No answer text provided.")) +
+  scale_fill_manual(values = c("is an inline view"= "green" ) ,guide="none")
+
+
+```
+
+
+# Question 4
+## An inner join between two tables returns
+
+* Only rows with a common identifier
+* All rows from one table, plus matching rows from the other
+* All rows in both tables
+
+```{r}
+ ggplot(survey_df , aes(x=ANSWER_4 ,fill=ANSWER_4)) + 
+  geom_bar(width=0.2) + 
+   scale_x_discrete(labels= c("All rows in both tables" = "ALL ROWS" ,"No answer text provided." = "NO ANSWER" ,"Only rows with a common identifier" = "COMMON IDENTIFIER" , "All rows from one table, plus matching rows from the other" = "ALL PLUS MATCHING" ) , limits = c("All rows in both tables" , "Only rows with a common identifier" ,"All rows from one table, plus matching rows from the other" , "No answer text provided.")) + 
+  scale_fill_manual(values=c("Only rows with a common identifier" = "green") , guide="none")
+
+
+```
+
+# Question 5
+## The CAST statement:
+
+* Moves a column's position
+* Converts the variable type of a column
+* Updates an index
+
+```{r}
+
+ggplot(survey_df , aes(x=ANSWER_5 , fill=ANSWER_5)) + 
+  geom_bar(width=0.2) + 
+  scale_x_discrete(labels=c("Converts the variable type of a column" = "Converts type" ,"No answer text provided." = "NO ANSWER" ,"Updates an index" = "UPDATES INDEX" ,"Moves a column's position" = "MOVES COLUMN'S POSITION") , limits=c("Converts the variable type of a column","No answer text provided." , "Moves a column's position" , "Updates an index" )) +
+  scale_fill_manual(values=c("Converts the variable type of a column" = "green") , guide="none")
+
+
+```
+
+# Question 6
+## What command would you use to calculate the number of days between two dates?
+```{r}
+library(ggwordcloud)
+ggplot(survey_df , aes(label = ANSWER_6)) +
+  geom_text_wordcloud() +
+  theme_minimal()
+```
+
+
