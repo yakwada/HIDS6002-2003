@@ -8,17 +8,22 @@ editor: visual
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 ```
 
-```{r}
-#read in data and clean it
-survey_df <- read.csv('Data/student_report.csv')
-#remove personal columns
-colnames(survey_df)
-survey_df <- survey_df[-c(1:7)]
+# Overall Results
 
+![Overall results](images/overall.jpg)
+
+# Import Data
+
+```{r}
+survey_df <- read.csv('Data/student_report.csv')
+
+colnames(survey_df)
+#dropping personal columns
+survey_df <- survey_df[-c(1:7)]
 
 ```
 
-# Clean Dataset
+# Cleaning Column Names
 
 ```{r }
 library(dplyr)
@@ -33,13 +38,16 @@ invisible(survey_df %>%
 
 colnames(survey_df)
 ```
-# Question 1 
+
+# Question 1
+
 ## Which command in SQL allows you to choose which columns will be returned in the result set?
 
-* GROUP BY
-* WHERE
-* SELECT
-* HAVING
+-   GROUP BY
+-   WHERE
+-   SELECT
+-   HAVING
+
 ```{r}
 library(ggplot2)
 library(gghighlight)
@@ -54,17 +62,14 @@ ggplot(survey_df , aes(x=ANSWER_1 , fill=ANSWER_1)) +
 ```
 
 # Question 2
+
 ## Where is the error in this SQL statement?
 
-_SELECT record_company, band, album, COUNT(*)
-FROM albums
-GROUP BY record_company, band
-HAVING COUNT(*) > 1_
+*SELECT record_company, band, album, COUNT() FROM albums GROUP BY record_company, band HAVING COUNT(*) \*
 
-* In the GROUP BY clause
-* In the FROM clause
-* in the HAVING clause
-
+-   In the GROUP BY clause
+-   In the FROM clause
+-   in the HAVING clause
 
 ```{r}
 
@@ -77,14 +82,14 @@ ggplot(survey_df , aes(x=ANSWER_2 , fill=ANSWER_2)) +
 
 ```
 
+# Question 3
 
-# Question 3 
 ## A common table expression:
 
-* embeds a formula in a column
-* is an inline view
-* is an alias for a table name
-* No answer text provided.
+-   embeds a formula in a column
+-   is an inline view
+-   is an alias for a table name
+-   No answer text provided.
 
 ```{r}
 
@@ -96,13 +101,13 @@ ggplot(survey_df , aes(x=ANSWER_2 , fill=ANSWER_2)) +
 
 ```
 
-
 # Question 4
+
 ## An inner join between two tables returns
 
-* Only rows with a common identifier
-* All rows from one table, plus matching rows from the other
-* All rows in both tables
+-   Only rows with a common identifier
+-   All rows from one table, plus matching rows from the other
+-   All rows in both tables
 
 ```{r}
  ggplot(survey_df , aes(x=ANSWER_4 ,fill=ANSWER_4)) + 
@@ -114,11 +119,12 @@ ggplot(survey_df , aes(x=ANSWER_2 , fill=ANSWER_2)) +
 ```
 
 # Question 5
+
 ## The CAST statement:
 
-* Moves a column's position
-* Converts the variable type of a column
-* Updates an index
+-   Moves a column's position
+-   Converts the variable type of a column
+-   Updates an index
 
 ```{r}
 
@@ -131,12 +137,12 @@ ggplot(survey_df , aes(x=ANSWER_5 , fill=ANSWER_5)) +
 ```
 
 # Question 6
+
 ## What command would you use to calculate the number of days between two dates?
+
 ```{r}
 library(ggwordcloud)
 ggplot(survey_df , aes(label = ANSWER_6)) +
   geom_text_wordcloud() +
-  theme_minimal()
+  theme_bw()
 ```
-
-

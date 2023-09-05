@@ -94,11 +94,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
+<section id="overall-results" class="level1">
+<h1>Overall Results</h1>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/overall.jpg" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Overall results</figcaption>
+</figure>
+</div>
+</section>
+<section id="import-data" class="level1">
+<h1>Import Data</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#read in data and clean it</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>survey_df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">'Data/student_report.csv'</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#remove personal columns</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(survey_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>survey_df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">'Data/student_report.csv'</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(survey_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> [1] "name"                                                                                                                                                      
  [2] "id"                                                                                                                                                        
@@ -123,10 +133,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 [21] "n.incorrect"                                                                                                                                               
 [22] "score"                                                                                                                                                     </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>survey_df <span class="ot">&lt;-</span> survey_df[<span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#dropping personal columns</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>survey_df <span class="ot">&lt;-</span> survey_df[<span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="clean-dataset" class="level1">
-<h1>Clean Dataset</h1>
+</section>
+<section id="cleaning-column-names" class="level1">
+<h1>Cleaning Column Names</h1>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>rep_let <span class="ot">=</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"ANSWER_"</span> , <span class="st">"POINTS_"</span>) , <span class="at">times=</span><span class="dv">6</span>)</span>
@@ -174,7 +186,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Question 2</h1>
 <section id="where-is-the-error-in-this-sql-statement" class="level2">
 <h2 class="anchored" data-anchor-id="where-is-the-error-in-this-sql-statement">Where is the error in this SQL statement?</h2>
-<p><em>SELECT record_company, band, album, COUNT(<em>) FROM albums GROUP BY record_company, band HAVING COUNT(</em>) &gt; 1</em></p>
+<p><em>SELECT record_company, band, album, COUNT() FROM albums GROUP BY record_company, band HAVING COUNT(</em>) *</p>
 <ul>
 <li>In the GROUP BY clause</li>
 <li>In the FROM clause</li>
@@ -260,7 +272,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggwordcloud)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(survey_df , <span class="fu">aes</span>(<span class="at">label =</span> ANSWER_6)) <span class="sc">+</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text_wordcloud</span>() <span class="sc">+</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="SQL_QUIZ_html_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
 </div>
