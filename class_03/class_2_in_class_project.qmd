@@ -1,0 +1,93 @@
+---
+title: "Quarto database example"
+format: 
+  html:
+    embed-resources: true
+---
+
+This is an example Quarto document that shows how to connect to the Synthetic MGUH database (a PostgreSQL database in the Google Cloud environment). Quarto is most commonly used to execute chunks of Python or R code sequentially, but can be used for many different kinds of code including SQL. Here we will use it as a wrapper around SQL and RStudio as a basic interface to our database to query the database.
+
+```{r}
+#| warning: false
+library(tidyverse)     # loads the tidyverse tools
+library(RPostgres)     # loads the database driver for PostgreSQL
+library(connections)   # helps RPostgres work with RStudio
+library(keyring)       # access to a local encrypted keychain for passwords
+
+con <- connection_open(RPostgres::Postgres(),
+          dbname = "syntheticMGUH2022",
+          host = "334.85.177.140",
+          user = "hids502_student",
+          password = key_get(service = "syntheticmguh", 
+                             username = "hids502_student"))
+```
+
+# Question 1
+
+How many patients do we have in the database?
+
+```{sql connection=con}
+SELECT COUNT(*) AS patient_count
+FROM patients 
+```
+
+
+How many providers and payers are represented in the data set?
+
+```{sql connection=con}
+-- Your code goes here
+```
+
+
+# Question 2
+
+What is the mean amount spent per patient?
+
+What does this look like broken down by year?
+
+# Question 3
+
+What is the mean amount spent for Medicare patients?
+
+What does this look like broken down by  year?
+
+# Question 4
+
+Using a common table expression, what are the min, max, and mean number of patients per provider?
+
+Using the raw data in R, plot this as a boxplot as well.
+
+Here's an example of a boxplot (note the additional use of the `y` axis that you probably don't need here.)
+
+```{sql connection=con, output.var="expenses_df"}
+-- Here we use `output.var` to assign the results of the query to a variable
+-- rather than printing!
+SELECT id, race, healthcare_expenses FROM patients
+```
+
+```{r}
+ggplot(expenses_df) + 
+  geom_boxplot(aes(x = healthcare_expenses, y = race))
+```
+
+# Question 5
+
+What is the min/max and mean number of encounters per patient in 2019? 
+
+Plot the distribution as a histogram – this will require you to use R
+
+Here's an example of a boxplot
+
+```{r}
+ggplot(expenses_df) + 
+  geom_histogram(aes(x = healthcare_expenses))
+```
+# Question 6 
+
+What time frame does the database cover? In other words, when does the data start and when does it end?
+
+Show the volume of visits over time (as a table or a plot)
+
+```{sql connection=con}
+-- Your code goes here
+```
