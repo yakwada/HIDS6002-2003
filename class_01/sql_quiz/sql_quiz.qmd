@@ -1,42 +1,34 @@
 ---
-title: "SQL QUIZ Results"
-format: html
-editor: visual
+title: "SQL quiz results"
+format: 
+  html:
+    embed-resources: true
 ---
 
 ```{r setup, include=FALSE}
+library(dplyr)
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 ```
 
-# Overall Results
-
-![Overall results](images/overall.jpg)
-
 # Import Data
 
-```{r}
+```{r include=FALSE}
+#read the data in
 survey_df <- read.csv('Data/student_report.csv')
 
-colnames(survey_df)
 #dropping personal columns
-survey_df <- survey_df[-c(1:7)]
+survey_df <- survey_df[-c(1:9)]
 
-```
-
-# Cleaning Column Names
-
-```{r }
-library(dplyr)
+# Replace the names with something easier to work with
 rep_let = rep(c("ANSWER_" , "POINTS_") , times=6)
 rep_num = as.character(rep(c(1:6) , each=2))
 col_names = paste0(rep_let, rep_num)
 
 names(survey_df)[1:12] <- c(col_names)
-invisible(survey_df %>%
+survey_df <- 
+  survey_df %>%
   mutate_all(as.character)
-)
 
-colnames(survey_df)
 ```
 
 # Question 1
@@ -48,6 +40,8 @@ colnames(survey_df)
 -   SELECT
 -   HAVING
 
+The `SELECT` command is the first line of a standard SQL query and indicates which columns in the result set should be returned. `WHERE` is SQL's filtering command. `GROUP BY` groups data by a single field to support aggregation, while `HAVING` is a secondary filter that can be used after a `GROUP BY` operation.
+
 ```{r}
 library(ggplot2)
 library(gghighlight)
@@ -56,20 +50,22 @@ ggplot(survey_df , aes(x=ANSWER_1 , fill=ANSWER_1)) +
   geom_bar(width=0.2 ) +
   scale_x_discrete(limits=c( "GROUP BY" ,"SELECT" ,  "HAVING" , "WHERE")) +
   scale_fill_manual(values = c("SELECT"= "green" ) ,guide="none")
-  
-
-
 ```
 
 # Question 2
 
 ## Where is the error in this SQL statement?
 
-*SELECT record_company, band, album, COUNT() FROM albums GROUP BY record_company, band HAVING COUNT(*) \*
+`SELECT record_company, band, album, COUNT()  
+FROM albums 
+GROUP BY record_company, band  
+HAVING COUNT(*)`
 
--   In the GROUP BY clause
--   In the FROM clause
--   in the HAVING clause
+-   In the `GROUP BY` clause
+-   In the `FROM` clause
+-   in the `HAVING` clause
+
+When grouping using the `GROUP BY` clause, any field in the `SELECT` clause must either be something we are grouping by, or an "aggregation" command (like `COUNT()`)
 
 ```{r}
 
@@ -91,6 +87,8 @@ ggplot(survey_df , aes(x=ANSWER_2 , fill=ANSWER_2)) +
 -   is an alias for a table name
 -   No answer text provided.
 
+A common table expression (CTE) is a way of writing a subquery like a view to help with clarity of your code. Its often called an 'inline view' for this reason. 
+
 ```{r}
 
  ggplot(survey_df , aes(x=ANSWER_3 , fill = ANSWER_3)) + 
@@ -109,6 +107,8 @@ ggplot(survey_df , aes(x=ANSWER_2 , fill=ANSWER_2)) +
 -   All rows from one table, plus matching rows from the other
 -   All rows in both tables
 
+In general you only need to remember to kinds of joins - a "LEFT OUTER JOIN" and an "INNER JOIN". Because all directional joins are "outer" joins "LEFT JOIN" is shorthand for "LEFT OUTER JOIN". An inner join returns only the rows that have a matching identifier in both tables, while a left join returns all rows from the left hand table (regardless of match), but only rows on the right where there is a match.
+
 ```{r}
  ggplot(survey_df , aes(x=ANSWER_4 ,fill=ANSWER_4)) + 
   geom_bar(width=0.2) + 
@@ -126,6 +126,8 @@ ggplot(survey_df , aes(x=ANSWER_2 , fill=ANSWER_2)) +
 -   Converts the variable type of a column
 -   Updates an index
 
+The `CAST` statement changes the variable type of a column or returned variable.
+
 ```{r}
 
 ggplot(survey_df , aes(x=ANSWER_5 , fill=ANSWER_5)) + 
@@ -139,6 +141,16 @@ ggplot(survey_df , aes(x=ANSWER_5 , fill=ANSWER_5)) +
 # Question 6
 
 ## What command would you use to calculate the number of days between two dates?
+
+Date "addition" isn't well defined in standard SQL and is often handled differently by different databases ("language extensions")
+
+All SQL databases should support simple subtraction such as "date1 - date2" yielding a number of days.
+
+Sometimes however we want our answer in a different way, and generally need a function
+
+MS SQL Server has the command `DATEDIFF` which takes how you want the returned interval (hours, days, weeks etc) and two dates and returns the difference.
+
+PostgresSQL which we will be using doesn't have a command like this, but it has something similar, the `AGE()` function. Instead of returning a number of days, it returns a special variable type called an `interval`. If we look at this as a string it will appear something like "1 year, 2 months and 3 days", but underneath is really just an integer representing time in seconds. We can use a second function `EXTRACT` to pull out the portion we want, eg `EXTRACT(DAYS FROM AGE(birthdate, deathdate))`
 
 ```{r}
 library(ggwordcloud)
