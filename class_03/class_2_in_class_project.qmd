@@ -1,11 +1,11 @@
 ---
-title: "Quarto database example"
+title: "Class 3 Project"
 format: 
   html:
     embed-resources: true
 ---
 
-This is an example Quarto document that shows how to connect to the Synthetic MGUH database (a PostgreSQL database in the Google Cloud environment). Quarto is most commonly used to execute chunks of Python or R code sequentially, but can be used for many different kinds of code including SQL. Here we will use it as a wrapper around SQL and RStudio as a basic interface to our database to query the database.
+This file serves as a template for the Class 3 in-class project.
 
 ```{r}
 #| warning: false
@@ -15,8 +15,8 @@ library(connections)   # helps RPostgres work with RStudio
 library(keyring)       # access to a local encrypted keychain for passwords
 
 con <- connection_open(RPostgres::Postgres(),
-          dbname = "syntheticMGUH2022",
-          host = "334.85.177.140",
+          dbname = "syntheticMGUH",
+          host = "34.85.177.140",
           user = "hids502_student",
           password = key_get(service = "syntheticmguh", 
                              username = "hids502_student"))
@@ -72,7 +72,7 @@ ggplot(expenses_df) +
 
 # Question 5
 
-What is the min/max and mean number of encounters per patient in 2019? 
+What is the min/max and mean number of encounters per patient in 2022? 
 
 Plot the distribution as a histogram – this will require you to use R
 
@@ -82,7 +82,7 @@ Here's an example of a boxplot
 ggplot(expenses_df) + 
   geom_histogram(aes(x = healthcare_expenses))
 ```
-# Question 6 
+# Question 6 (Optional)
 
 What time frame does the database cover? In other words, when does the data start and when does it end?
 
