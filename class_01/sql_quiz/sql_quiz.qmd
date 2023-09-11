@@ -12,12 +12,12 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 
 # Import Data
 
-```{r include=FALSE}
+```{r }
 #read the data in
 survey_df <- read.csv('Data/student_report.csv')
 
 #dropping personal columns
-survey_df <- survey_df[-c(1:9)]
+survey_df <- survey_df[-c(1:7)]
 
 # Replace the names with something easier to work with
 rep_let = rep(c("ANSWER_" , "POINTS_") , times=6)
@@ -44,7 +44,6 @@ The `SELECT` command is the first line of a standard SQL query and indicates whi
 
 ```{r}
 library(ggplot2)
-library(gghighlight)
 
 ggplot(survey_df , aes(x=ANSWER_1 , fill=ANSWER_1)) + 
   geom_bar(width=0.2 ) +
