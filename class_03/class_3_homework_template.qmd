@@ -1,0 +1,57 @@
+---
+title: "Class 3 Homework Template"
+format: 
+  html:
+    embed-resources: true
+---
+
+This document provides you with a template for the class 3 homework. Your answers should be a mix of text (answering the first part of the question) and SQL queries, with explanation.
+
+```{r}
+#| warning: false
+library(tidyverse)     # loads the tidyverse tools
+library(RPostgres)     # loads the database driver for PostgreSQL
+library(connections)   # helps RPostgres work with RStudio
+library(keyring)       # access to a local encrypted keychain for passwords
+
+con <- connection_open(RPostgres::Postgres(),
+          dbname = "syntheticMGUH",
+          host = "34.85.177.140",
+          user = "hids502_student",
+          password = key_get(service = "syntheticmguh", 
+                             username = "hids502_student"))
+```
+
+# Morbidity and Mortality
+
+What are the top 3 causes of morbidity (illness) and the top 3 causes of mortality (death) in the US? 
+
+In the Synthea data set, how would you estimate similar answers? 
+
+(Hint - LOINC code '69453-9' is 'Cause of Death [US Standard Certificate of Death]' and can be found in the `observations` table. Patients have encounters, which in turn have observations. This is where the cause of death is recorded. Illnesses can be found in the `conditions` table (ie, diagnosis made a different encounters))
+
+
+# Insurance
+
+What is the breakdown of spending between Medicaid, Medicare and everything else in the US? Why do you think it might break down this way? 
+
+In the Synthea data set, how would you estimate similar answers?
+
+(Hint: This will require you to look at the `encounters` table and join it against the `payers` table where you will find the names of the payers. You will likely find this easier to do for a single year, eg 2022!.)
+
+# Lack of Insurance
+
+What percent of Americans are estimated to be uninsured in the United States? How has this changed over the past 15 years, and why?
+
+In the Synthea data set, how would you estimate similar answers?
+
+(Hint - Every encounter in Synthea has a payer ID - there is actually an entry in the `payers` table for "No Insurance", rather than the payer ID being NULL in the `encounters` table. Each encounter has insurance information associated with it, but if you want to know someone's insurance status at any given time you need the 'payer_transitions' table which is a history of patient's insurance coverage.)
+
+
+# Surprise Billing
+
+What is meant by "surprise billing" in the US? 
+
+* How would you find evidence of this in the Synthea data set? Show whether it exists or does not exist in Synthea. 
+
+(Hint - this is difficult, and you will get full points for any thoughtful attempt that runs. One way to think about it would to look for patients that appeared to have insurance the time of the encounter (`payer_transitions` table) but whose encounter was billed to `NO_INSURANCE`. Another would be to look for encounters where there was a valid payer but no-reimbursement by the payer (eg `payer_coverage` = 0), but this could also be just declined coverage!)

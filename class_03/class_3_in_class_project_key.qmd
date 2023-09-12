@@ -1,0 +1,224 @@
+---
+title: "Class 3 in class project key"
+format: 
+  html:
+    embed-resources: true
+---
+
+This document is the answer key for the in class project from Class 3!
+
+```{r}
+#| warning: false
+library(tidyverse)     # loads the tidyverse tools
+library(RPostgres)     # loads the database driver for PostgreSQL
+library(connections)   # helps RPostgres work with RStudio
+library(keyring)       # access to a local encrypted keychain for passwords
+
+con <- connection_open(RPostgres::Postgres(),
+          dbname = "syntheticMGUH",
+          host = "34.85.177.140",
+          user = "hids502_student",
+          password = key_get(service = "syntheticmguh", 
+                             username = "hids502_student"),
+          # Tell the driver to return very large integers as floating point (vs truncating them)
+          bigint = "numeric")
+```
+
+# Question 1
+
+How many providers and payers are represented in the data set?
+
+```{sql connection=con}
+-- Your code goes here
+SELECT COUNT(DISTINCT id) AS patients FROM patients
+```
+```{sql connection=con}
+-- Your code goes here
+SELECT COUNT(DISTINCT id) AS payers FROM payers
+```
+
+# Question 2
+
+What is the mean amount spent per patient?
+
+This contains the lifetime expenses for patients
+```{sql connection=con}
+SELECT AVG(healthcare_expenses) FROM patients
+```
+
+What does this look like per year?
+
+```{sql connection=con}
+-- Your code goes here
+SELECT date_part('year', start) as claim_year, 
+sum(total_claim_cost) total_claim_costs, 
+count(distinct patient) as patients, 
+sum(total_claim_cost) / count(distinct patient) as avg_expenses
+FROM encounters
+-- Having data from as far back as 1910 is a bid odd. Lets trim that
+WHERE start >= '2011-01-01'
+GROUP BY claim_year
+ORDER BY claim_year DESC
+```
+
+
+# Question 3
+
+What is the mean amount spent for Medicare patients?
+What does this look like per year?
+
+Note that this query shows just Medicare claims - this is different from saying "what are the total costs for someone who has Medicare, regardless of whether or not Medicare is the payer"!
+```{sql connection=con}
+SELECT date_part('year', start) as claim_year, sum(total_claim_cost), count(distinct patient) as patients, 
+sum(total_claim_cost) / count(distinct patient) as avg_expenses
+FROM encounters
+ INNER JOIN payers ON encounters.payer = payers.id
+   AND payers.name = 'Medicare'
+WHERE start >= '2011-01-01'
+GROUP BY claim_year
+ORDER BY claim_year DESC
+```
+
+# Question 4
+
+What is the min/max and mean number of patients per provider?
+
+```{sql connection=con}
+WITH provider_patient_count AS (
+ SELECT provider, COUNT(DISTINCT patient) patient_count 
+ FROM encounters
+ -- We will restrict to the last year for convenience ...
+ WHERE start >= '2022-01-01'
+ GROUP BY provider
+)
+SELECT 
+  MIN(patient_count) min_patients,
+  MAX(patient_count) max_patients,
+  AVG(patient_count) avg_patients
+FROM provider_patient_count
+```
+
+Plot this as a boxplot – this will require you to use R
+
+Here's an example of a boxplot
+
+Like many EMR's there's no concept of a patient "belonging" to a provider, so we need to use encounters to determine this. We will do this is a two step process:
+
+```{sql connection=con, output.var="patients_df"}
+-- Here we use `output.var` to assign the results of the query to a variable
+-- rather than printing!
+ SELECT provider, COUNT(DISTINCT patient) patient_count 
+ FROM encounters
+ WHERE start BETWEEN '2022-01-01' AND '2022-12-31'
+ GROUP BY provider
+```
+
+The boxplot isn't super useful due to the outliers
+```{r}
+mutate(patients_df, patient_count = as.integer(patient_count)) %>%
+  ggplot() + 
+  geom_boxplot(aes(x = patient_count))
+```
+
+Well thats a little wierd - thats an aweful lot of patients for one person to see! Who is this?
+
+```{sql connection=con}
+WITH provider_patient_count AS (
+ SELECT provider, COUNT(DISTINCT patient) patient_count 
+ FROM encounters
+ WHERE start BETWEEN '2022-01-01' AND '2022-12-31'
+ GROUP BY provider
+)
+SELECT providers.id, providers.name, providers.speciality, patient_count
+FROM provider_patient_count
+LEFT JOIN providers ON providers.id = provider
+ORDER BY patient_count DESC 
+LIMIT 1
+```
+This is pretty implausible - and a glitch in our synthetic data.
+
+In reality there the data are distributed with a large right side tail, with a small number of providers seeing an almost impossible number of patients. If we drop them ...
+
+```{r}
+filter(patients_df, patient_count < 500) %>%
+  mutate(patient_count = as.integer(patient_count)) %>%
+  ggplot() + 
+  geom_boxplot(aes(x = patient_count))
+```
+
+# Question 5
+
+What is the min/max and mean number of encounters per patient in 2019? 
+
+Here we say "how many encounters did patients have - who had at least one encounter"
+
+```{sql connection=con}
+WITH patient_encounter_count AS (
+ SELECT patient, COUNT(DISTINCT id) encounter_count 
+ FROM encounters
+ WHERE start >= '2019-01-01' AND start < '2020-01-01'
+ GROUP BY patient
+)
+SELECT 
+  MIN(encounter_count) min_encounters,
+  MAX(encounter_count) max_encounters,
+  AVG(encounter_count) avg_encounters
+FROM patient_encounter_count
+```
+
+But if we meant all of our patients, regardless of whether they had an encounter or not, it looks a bit different ...
+```{sql connection=con}
+WITH patient_encounter_count AS (
+ SELECT patients.id patient, COUNT(DISTINCT encounters.id) encounter_count 
+ FROM patients 
+ LEFT JOIN encounters 
+   ON encounters.patient = patients.id
+   -- IMPORTANT you need to filter in the join.
+   -- if you filter in a WHERE statement you will lose the patients without data
+   AND start >= '2019-01-01' AND start < '2020-01-01'
+ GROUP BY patients.id
+)
+SELECT 
+  COUNT(DISTINCT patient) patients,
+  MIN(encounter_count) min_encounters,
+  MAX(encounter_count) max_encounters,
+  AVG(encounter_count) avg_encounters
+FROM patient_encounter_count
+```
+
+
+Plot the distribution as a histogram – this will require you to use R
+
+```{sql connection=con, output.var="encounters_df"}
+ SELECT patient, COUNT(DISTINCT id) encounter_count 
+ FROM encounters
+ WHERE start BETWEEN '2022-01-01' AND '2022-12-31'
+ GROUP BY patient
+```
+
+Histogram tells that the vast majority of patients really only had 1 encounter in 2009
+
+```{r}
+ggplot(encounters_df) + 
+  geom_histogram(aes(x = encounter_count))  
+```
+
+# Question 6 
+
+What time frame does the database cover? In other words, when does the data start and when does it end?
+
+Show the volume of visits over time (as a table or a plot)
+
+```{sql connection=con}
+-- Your code goes here
+SELECT min(start) as first_visit, max(start) as last_visit
+from encounters
+```
+
+```{sql connection=con}
+-- Your code goes here
+SELECT EXTRACT(year FROM start) AS visit_year, COUNT(*)
+from encounters
+GROUP BY EXTRACT(year FROM start)
+ORDER BY EXTRACT(year FROM start) DESC
+```

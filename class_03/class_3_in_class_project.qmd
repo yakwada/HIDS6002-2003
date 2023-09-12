@@ -19,7 +19,10 @@ con <- connection_open(RPostgres::Postgres(),
           host = "34.85.177.140",
           user = "hids502_student",
           password = key_get(service = "syntheticmguh", 
-                             username = "hids502_student"))
+                             username = "hids502_student"),
+          # Tell the driver to return very large integers as floating point (vs truncating them)
+          bigint = "numeric")
+        
 ```
 
 # Question 1
@@ -44,12 +47,32 @@ How many providers and payers are represented in the data set?
 What is the mean amount spent per patient?
 
 What does this look like broken down by year?
+```{sql connection=con}
+-- Your code goes here
+SELECT EXTRACT(YEAR FROM start) as billing_year, 
+       sum(payer_coverage) as total_reimbursement
+FROM ENCOUNTERS
+GROUP BY billing_year
+ORDER BY billing_year DESC
+```
+
 
 # Question 3
 
 What is the mean amount spent for Medicare patients?
 
+
 What does this look like broken down by  year?
+```{sql connection=con}
+-- Your code goes here
+SELECT EXTRACT(YEAR FROM start) as billing_year, 
+       sum(payer_coverage)/count(DISTINCT patient) as total_reimbursement
+FROM ENCOUNTERS
+INNER JOIN payers on encounters.payer = payers.id
+WHERE payers.name = 'Medicare'
+GROUP BY billing_year
+ORDER BY billing_year DESC
+```
 
 # Question 4
 
