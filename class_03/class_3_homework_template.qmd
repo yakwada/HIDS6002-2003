@@ -24,34 +24,70 @@ con <- connection_open(RPostgres::Postgres(),
 
 # Morbidity and Mortality
 
-What are the top 3 causes of morbidity (illness) and the top 3 causes of mortality (death) in the US? 
+## What are the top 3 causes of morbidity (illness) and the top 3 causes of mortality (death) in the US? 
+
+### The top 3 causes of illnesses in the US are chronic lower respiratory diseases, cancer, and heart disease.According to the CDC, the three causes of death in  the USA are heart disease, cancer, and COVID-19
 
 In the Synthea data set, how would you estimate similar answers? 
+```{sql connection=con}
 
+
+
+
+
+
+```
 (Hint - LOINC code '69453-9' is 'Cause of Death [US Standard Certificate of Death]' and can be found in the `observations` table. Patients have encounters, which in turn have observations. This is where the cause of death is recorded. Illnesses can be found in the `conditions` table (ie, diagnosis made a different encounters))
 
 
 # Insurance
 
-What is the breakdown of spending between Medicaid, Medicare and everything else in the US? Why do you think it might break down this way? 
+## What is the breakdown of spending between Medicaid, Medicare and everything else in the US? Why do you think it might break down this way? 
+
+### Medicare spending grew 8.4% to 900.8 billion in 2021 or total 21% NHE. Medicaid spending grew 9.2% to 730.0 billion in 2021 or 17% percent of total NHE. Private health insurance spending grew 5.8% to 1.211.4 billion in 201 or 28% of total NHE. 
+
 
 In the Synthea data set, how would you estimate similar answers?
 
+```{sql connection=con}
+
+
+
+
+
+```
 (Hint: This will require you to look at the `encounters` table and join it against the `payers` table where you will find the names of the payers. You will likely find this easier to do for a single year, eg 2022!.)
 
 # Lack of Insurance
 
-What percent of Americans are estimated to be uninsured in the United States? How has this changed over the past 15 years, and why?
+## What percent of Americans are estimated to be uninsured in the United States? How has this changed over the past 15 years, and why?
+
+### 8.4% or 27.6 million Americans of all ages did not have health insurance in 2022. The national uninsured rate reached an all-time low of 7.7 percent. According to the CDC, in 2008, 43.8 million persons of all ages (14.7%) were uninsured. It looks like the number of uninsured individuals in the USA increase over the past 15 years. I believe the high cost of healthcare coverage has increase and the number of people unemployed.
+
 
 In the Synthea data set, how would you estimate similar answers?
+```{sql connection=con}
 
+
+
+```
 (Hint - Every encounter in Synthea has a payer ID - there is actually an entry in the `payers` table for "No Insurance", rather than the payer ID being NULL in the `encounters` table. Each encounter has insurance information associated with it, but if you want to know someone's insurance status at any given time you need the 'payer_transitions' table which is a history of patient's insurance coverage.)
 
 
 # Surprise Billing
 
-What is meant by "surprise billing" in the US? 
+## What is meant by "surprise billing" in the US?  
+
+### Surprise billing are unexpected health care bill when you had received care from a provider you're not covered by.
+
 
 * How would you find evidence of this in the Synthea data set? Show whether it exists or does not exist in Synthea. 
+```{sql connection=con}
 
+
+
+
+
+
+```
 (Hint - this is difficult, and you will get full points for any thoughtful attempt that runs. One way to think about it would to look for patients that appeared to have insurance the time of the encounter (`payer_transitions` table) but whose encounter was billed to `NO_INSURANCE`. Another would be to look for encounters where there was a valid payer but no-reimbursement by the payer (eg `payer_coverage` = 0), but this could also be just declined coverage!)
